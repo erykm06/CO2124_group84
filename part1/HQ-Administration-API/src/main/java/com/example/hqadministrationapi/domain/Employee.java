@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.Column;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -31,6 +32,13 @@ public class Employee {
     @NotBlank
     @Email
     private String email;
+
+    private String address;
+
+    @NotNull
+    @Enumerated(EnumType.STRING)
+    @Column(name = "employee_rank", nullable = false)
+    private Rank rank = Rank.JUNIOR;
 
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -109,4 +117,10 @@ public class Employee {
     public void setAssignments(List<Assignment> assignments) {
         this.assignments = assignments;
     }
+
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+
+    public Rank getRank() { return rank; }
+    public void setRank(Rank rank) { this.rank = rank; }
 }

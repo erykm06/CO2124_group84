@@ -100,8 +100,8 @@ paths:
       tags: [Employees]
       summary: Promote an employee (HR only)
       description: |
-        Advances rank (JUNIOR→MID→SENIOR) and raises salary 10%.
-        Rules: employee must have ≥6 months tenure and not be SENIOR.
+        Advances rank (JUNIOR to MID to SENIOR) and raises salary 10%.
+        Rules: employee must have more than 6 months tenure and not be a SENIOR role.
       parameters:
         - in: path
           name: id
@@ -114,7 +114,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/EmployeeResponse' }
         '400':
-          description: Not eligible (tenure < 6 months or already SENIOR)
+          description: Not eligible (tenure less than 6 months or already SENIOR role)
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }

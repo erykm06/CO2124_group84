@@ -1,0 +1,289 @@
+openapi: 3.0.3
+info:
+  title: HQ Administration API
+  version: 1.0.0
+  description: |
+    Secure backend for HQ personnel administration.
+    Authentication: HTTP Basic. Roles: HR (full access), MANAGER (read-only).
+
+servers:
+  - url: https://localhost:8443
+    description: Local development (HTTPS, self-signed)
+
+security:
+  - basicAuth: []
+
+tags:
+  - name: Employees
+  - name: Departments
+  - name: Assignments
+
+paths:
+  /api/employees:
+    get:
+      tags: [Employees]
+      summary: List employees (optionally filter by department name)
+      parameters:
+        - in: query
+          name: department
+          schema: { type: string }
+          required: false
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/EmployeeResponse' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+    post:
+      tags: [Employees]
+      summary: Create an employee (HR only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmployeeCreateRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EmployeeResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '401': { $ref: '#/components/responses/Unauthorized' }
+        '403': { $ref: '#/components/responses/Forbidden' }
+
+  /api/employees/{id}:
+    parameters:
+      - in: path
+        name: id
+        required: true
+        schema: { type: integer, format: int64 }
+    get:
+      tags: [Employees]
+      summary: Get one employee
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EmployeeResponse' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    put:
+      tags: [Employees]
+      summary: Update an employee (HR only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/EmployeeUpdateRequest' }
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EmployeeResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+    delete:
+      tags: [Employees]
+      summary: Delete an employee (HR only)
+      responses:
+        '204': { description: Deleted }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/employees/{id}/promote:
+    post:
+      tags: [Employees]
+      summary: Promote an employee (HR only)
+      description: |
+        Advances rank (JUNIOR→MID→SENIOR) and raises salary 10%.
+        Rules: employee must have ≥6 months tenure and not be SENIOR.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '200':
+          description: Promoted
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/EmployeeResponse' }
+        '400':
+          description: Not eligible (tenure < 6 months or already SENIOR)
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/ErrorResponse' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/departments:
+    get:
+      tags: [Departments]
+      summary: List departments
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/DepartmentResponse' }
+    post:
+      tags: [Departments]
+      summary: Create a department (HR only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/DepartmentRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/DepartmentResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+
+  /api/assignments:
+    post:
+      tags: [Assignments]
+      summary: Create an assignment (HR only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/AssignmentRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/AssignmentResponse' }
+        '400': { $ref: '#/components/responses/BadRequest' }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+  /api/assignments/{id}:
+    delete:
+      tags: [Assignments]
+      summary: Delete an assignment (HR only)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer, format: int64 }
+      responses:
+        '204': { description: Deleted }
+        '404': { $ref: '#/components/responses/NotFound' }
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  responses:
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    Forbidden:
+      description: Authenticated but role not permitted
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+    BadRequest:
+      description: Validation failure
+      content:
+        application/json:
+          schema: { $ref: '#/components/schemas/ErrorResponse' }
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        error: { type: string, example: "Employee 42 not found" }
+
+    ContractType:
+      type: string
+      enum: [FULL_TIME, PART_TIME, CONTRACT, INTERN]
+
+    Rank:
+      type: string
+      enum: [JUNIOR, MID, SENIOR]
+
+    EmployeeCreateRequest:
+      type: object
+      required: [name, email, contractType, startDate, salary]
+      properties:
+        name:         { type: string, example: "Alice Doe" }
+        email:        { type: string, format: email }
+        address:      { type: string }
+        contractType: { $ref: '#/components/schemas/ContractType' }
+        startDate:    { type: string, format: date }
+        salary:       { type: number, format: double, minimum: 0 }
+
+    EmployeeUpdateRequest:
+      type: object
+      properties:
+        name:         { type: string }
+        email:        { type: string, format: email }
+        address:      { type: string }
+        contractType: { $ref: '#/components/schemas/ContractType' }
+        startDate:    { type: string, format: date }
+        salary:       { type: number, format: double }
+
+    EmployeeResponse:
+      type: object
+      properties:
+        id:           { type: integer, format: int64 }
+        name:         { type: string }
+        email:        { type: string, format: email }
+        address:      { type: string }
+        rank:         { $ref: '#/components/schemas/Rank' }
+        contractType: { $ref: '#/components/schemas/ContractType' }
+        startDate:    { type: string, format: date }
+        salary:       { type: number, format: double }
+
+    DepartmentRequest:
+      type: object
+      required: [name, budget, location]
+      properties:
+        name:     { type: string }
+        budget:   { type: number, format: double, minimum: 0 }
+        location: { type: string }
+
+    DepartmentResponse:
+      type: object
+      properties:
+        id:       { type: integer, format: int64 }
+        name:     { type: string }
+        budget:   { type: number, format: double }
+        location: { type: string }
+
+    AssignmentRequest:
+      type: object
+      required: [employeeId, departmentId, role, accessLevel]
+      properties:
+        employeeId:   { type: integer, format: int64 }
+        departmentId: { type: integer, format: int64 }
+        role:         { type: string }
+        accessLevel:  { type: string }
+
+    AssignmentResponse:
+      type: object
+      properties:
+        id:           { type: integer, format: int64 }
+        employeeId:   { type: integer, format: int64 }
+        departmentId: { type: integer, format: int64 }
+        role:         { type: string }
+        accessLevel:  { type: string }

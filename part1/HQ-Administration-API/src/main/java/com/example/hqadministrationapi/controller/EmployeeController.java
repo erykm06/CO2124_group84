@@ -1,5 +1,6 @@
 package com.example.hqadministrationapi.controller;
 
+import com.example.hqadministrationapi.domain.Employee;
 import com.example.hqadministrationapi.dto.EmployeeCreateRequest;
 import com.example.hqadministrationapi.dto.EmployeeResponse;
 import com.example.hqadministrationapi.dto.EmployeeUpdateRequest;
@@ -9,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -24,7 +26,12 @@ public class EmployeeController {
 
     @GetMapping
     public List<EmployeeResponse> list(@RequestParam(required = false) String department) {
-        return service.list(department).stream().map(EmployeeResponse::from).toList();
+        List<Employee> employees = service.list(department);
+        List<EmployeeResponse> result = new ArrayList<>();
+        for (Employee e : employees) {
+            result.add(EmployeeResponse.from(e));
+        }
+        return result;
     }
 
 

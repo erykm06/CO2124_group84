@@ -47,7 +47,6 @@ public class EmployeeService {
         e.setContractType(req.contractType());
         e.setStartDate(req.startDate());
         e.setSalary(req.salary());
-        // rank defaults to JUNIOR in the entity
         return employees.save(e);
     }
 
@@ -60,7 +59,7 @@ public class EmployeeService {
         if (req.contractType() != null) e.setContractType(req.contractType());
         if (req.startDate() != null)    e.setStartDate(req.startDate());
         if (req.salary() != null)       e.setSalary(req.salary());
-        return e; // dirty-checked on tx commit
+        return e;
     }
 
     @Transactional

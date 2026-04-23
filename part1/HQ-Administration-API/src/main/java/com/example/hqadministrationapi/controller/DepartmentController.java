@@ -1,5 +1,6 @@
 package com.example.hqadministrationapi.controller;
 
+import com.example.hqadministrationapi.domain.Department;
 import com.example.hqadministrationapi.dto.DepartmentRequest;
 import com.example.hqadministrationapi.dto.DepartmentResponse;
 import com.example.hqadministrationapi.service.DepartmentService;
@@ -8,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,7 +24,11 @@ public class DepartmentController {
 
     @GetMapping
     public List<DepartmentResponse> list() {
-        return service.list().stream().map(DepartmentResponse::from).toList();
+        List<DepartmentResponse> result = new ArrayList<>();
+        for (Department d : service.list()) {
+            result.add(new DepartmentResponse(d));
+        }
+        return result;
     }
 
     @PostMapping

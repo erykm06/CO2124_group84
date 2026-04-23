@@ -100,7 +100,7 @@ paths:
       tags: [Employees]
       summary: Promote an employee (HR only)
       description: |
-        Advances rank (JUNIOR to MID to SENIOR) and raises salary 10%.
+        Advances rank (JUNIOR to INTERMEDIATE to SENIOR) and raises salary 10%.
         Rules: employee must have more than 6 months tenure and not be a SENIOR role.
       parameters:
         - in: path
@@ -219,7 +219,7 @@ components:
 
     Rank:
       type: string
-      enum: [JUNIOR, MID, SENIOR]
+      enum: [JUNIOR, INTERMEDIATE, SENIOR]
 
     EmployeeCreateRequest:
       type: object

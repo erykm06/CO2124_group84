@@ -21,19 +21,19 @@ public class EmployeeController {
         this.service = service;
     }
 
-    // GET /api/employees?department=Finance
+
     @GetMapping
     public List<EmployeeResponse> list(@RequestParam(required = false) String department) {
         return service.list(department).stream().map(EmployeeResponse::from).toList();
     }
 
-    // GET /api/employees/{id}
+
     @GetMapping("/{id}")
     public EmployeeResponse get(@PathVariable Long id) {
         return EmployeeResponse.from(service.get(id));
     }
 
-    // POST /api/employees
+
     @PostMapping
     public ResponseEntity<EmployeeResponse> create(@Valid @RequestBody EmployeeCreateRequest req) {
         var created = service.create(req);
@@ -42,22 +42,22 @@ public class EmployeeController {
                 .body(EmployeeResponse.from(created));
     }
 
-    // PUT /api/employees/{id}
+
     @PutMapping("/{id}")
     public EmployeeResponse update(@PathVariable Long id,
                                    @Valid @RequestBody EmployeeUpdateRequest req) {
         return EmployeeResponse.from(service.update(id, req));
     }
 
-    // DELETE /api/employees/{id}
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
 
-    // POST /api/employees/{id}/promote
-    @PostMapping("/{id}/promote")
+
+    @PutMapping("/{id}/promote")
     public EmployeeResponse promote(@PathVariable Long id) {
         return EmployeeResponse.from(service.promote(id));
     }

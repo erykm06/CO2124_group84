@@ -7,8 +7,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import java.time.Instant;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -16,37 +14,22 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity<Map<String, Object>> notFound(EntityNotFoundException ex) {
-        return build(HttpStatus.NOT_FOUND, ex.getMessage());
+    public ResponseEntity<Map<String, String>> notFound(EntityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(NotEligibleException.class)
-    public ResponseEntity<Map<String, Object>> notEligible(NotEligibleException ex) {
-        return build(HttpStatus.BAD_REQUEST, ex.getMessage());
+    public ResponseEntity<Map<String, String>> notEligible(NotEligibleException ex) {
+        return ResponseEntity.badRequest()
+                .body(Map.of("error", ex.getMessage()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> validation(MethodArgumentNotValidException ex) {
-        Map<String, String> fieldErrors = ex.getBindingResult().getFieldErrors().stream()
-                .collect(Collectors.toMap(
-                        err -> err.getField(),
-                        err -> err.getDefaultMessage() == null ? "invalid" : err.getDefaultMessage(),
-                        (a, b) -> a));
-        Map<String, Object> body = base(HttpStatus.BAD_REQUEST, "Validation failed");
-        body.put("fieldErrors", fieldErrors);
-        return ResponseEntity.badRequest().body(body);
-    }
-
-    private ResponseEntity<Map<String, Object>> build(HttpStatus status, String msg) {
-        return ResponseEntity.status(status).body(base(status, msg));
-    }
-
-    private Map<String, Object> base(HttpStatus status, String msg) {
-        Map<String, Object> m = new HashMap<>();
-        m.put("timestamp", Instant.now().toString());
-        m.put("status", status.value());
-        m.put("error", status.getReasonPhrase());
-        m.put("message", msg);
-        return m;
+    public ResponseEntity<Map<String, String>> validation(MethodArgumentNotValidException ex) {
+        String msg = ex.getBindingResult().getFieldErrors().stream()
+                .map(fe -> fe.getField() + " " + (fe.getDefaultMessage() == null ? "invalid" : fe.getDefaultMessage()))
+                .collect(Collectors.joining("; "));
+        return ResponseEntity.badRequest().body(Map.of("error", msg));
     }
 }

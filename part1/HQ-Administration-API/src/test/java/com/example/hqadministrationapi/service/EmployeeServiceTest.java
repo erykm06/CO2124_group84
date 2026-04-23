@@ -42,7 +42,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void promote_throwsWhenEmployeeDoesNotExist() {
+    void promoteThrowsWhenEmployeeDoesNotExist() {
         when(repo.findById(99L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.promote(99L))
@@ -52,7 +52,7 @@ class EmployeeServiceTest {
 
 
     @Test
-    void promote_throwsWhenTenureUnderSixMonths() {
+    void promoteThrowsWhenEmployeeWorkedLessThanSixMonths() {
         Employee e = sample(1L, Rank.JUNIOR,
                 LocalDate.now().minusMonths(3),
                 new BigDecimal("50000"));
@@ -65,7 +65,7 @@ class EmployeeServiceTest {
 
 
     @Test
-    void promote_throwsWhenAlreadySenior() {
+    void promoteThrowsWhenAlreadySenior() {
         Employee e = sample(1L, Rank.SENIOR,
                 LocalDate.now().minusYears(3),
                 new BigDecimal("90000"));
@@ -77,7 +77,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void promote_juniorBecomesMidWithTenPercentRaise() {
+    void promoteJuniorToIntermediateWithTenPercentRaise() {
         Employee e = sample(1L, Rank.JUNIOR,
                 LocalDate.now().minusYears(1),
                 new BigDecimal("50000"));
@@ -90,7 +90,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void promote_midBecomesSeniorWithTenPercentRaise() {
+    void promoteIntermediateToSeniorWithTenPercentRaise() {
         Employee e = sample(1L, Rank.INTERMEDIATE,
                 LocalDate.now().minusYears(2),
                 new BigDecimal("70000"));
@@ -103,7 +103,7 @@ class EmployeeServiceTest {
     }
 
     @Test
-    void get_throwsWhenEmployeeDoesNotExist() {
+    void getThrowsWhenEmployeeDoesNotExist() {
         when(repo.findById(42L)).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> service.get(42L))

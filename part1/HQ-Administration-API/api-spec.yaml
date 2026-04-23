@@ -96,7 +96,7 @@ paths:
         '404': { $ref: '#/components/responses/NotFound' }
 
   /api/employees/{id}/promote:
-    post:
+    put:
       tags: [Employees]
       summary: Promote an employee (HR only)
       description: |
@@ -215,7 +215,7 @@ components:
 
     ContractType:
       type: string
-      enum: [FULL_TIME, PART_TIME, CONTRACT, INTERN]
+      enum: [FULL_TIME, PART_TIME, CONTRACTOR, INTERN]
 
     Rank:
       type: string

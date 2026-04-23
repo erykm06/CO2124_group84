@@ -65,27 +65,22 @@ public class EmployeeService {
     @Transactional
     public void delete(Long id) {
         if (!employees.existsById(id)) {
-            throw new EntityNotFoundException("Employee " + id + " not found");
+            throw new EntityNotFoundException("There is no employee with id " + id);
         }
         employees.deleteById(id);
     }
 
-    /**
-     * Promote: advance rank one step (JUNIOR → INTERMEDIATE → SENIOR) and raise salary 10%.
-     * Rules:
-     *  - must have started at least 6 months ago
-     *  - must not already be SENIOR
-     */
+    //Promotes an employee from junior to senior
     @Transactional
     public Employee promote(Long id) {
         Employee e = get(id);
 
         if (e.getStartDate() == null
                 || e.getStartDate().isAfter(LocalDate.now().minusMonths(6))) {
-            throw new NotEligibleException("Employee started less than 6 months ago");
+            throw new NotEligibleException("Employee started working less than 6 months ago");
         }
         if (e.getRank() == Rank.SENIOR) {
-            throw new NotEligibleException("Employee already at top rank");
+            throw new NotEligibleException("Employee is already a Senior");
         }
 
         e.setRank(e.getRank() == Rank.JUNIOR ? Rank.INTERMEDIATE : Rank.SENIOR);

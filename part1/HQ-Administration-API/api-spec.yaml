@@ -3,8 +3,7 @@ info:
   title: HQ Administration API
   version: 1.0.0
   description: |
-    Secure backend for HQ personnel administration.
-    Authentication: HTTP Basic. Roles: HR (full access), MANAGER (read-only).
+    Secure backend for HQ admins with HR and Manager roles.
 
 servers:
   - url: https://localhost:8443
@@ -100,8 +99,9 @@ paths:
       tags: [Employees]
       summary: Promote an employee (HR only)
       description: |
-        Advances rank (JUNIOR to INTERMEDIATE to SENIOR) and raises salary 10%.
-        Rules: employee must have more than 6 months tenure and not be a SENIOR role.
+        Promotes and employee from Junior to Intermediate to Senior and raises salary 10%.
+        Given that the employee must have been at the job for more than 6 months
+        and not already be a Senior, otherwise they can't be promoted further.
       parameters:
         - in: path
           name: id
@@ -114,7 +114,7 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/EmployeeResponse' }
         '400':
-          description: Not eligible (tenure less than 6 months or already SENIOR role)
+          description: Not eligible worked for less than 6 months or is already a Senior
           content:
             application/json:
               schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -187,12 +187,12 @@ components:
 
   responses:
     Unauthorized:
-      description: Missing or invalid credentials
+      description: Not logged in
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ErrorResponse' }
     Forbidden:
-      description: Authenticated but role not permitted
+      description: Wrong role
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -202,7 +202,7 @@ components:
         application/json:
           schema: { $ref: '#/components/schemas/ErrorResponse' }
     BadRequest:
-      description: Validation failure
+      description: Bad input
       content:
         application/json:
           schema: { $ref: '#/components/schemas/ErrorResponse' }
@@ -211,7 +211,7 @@ components:
     ErrorResponse:
       type: object
       properties:
-        error: { type: string, example: "Employee 42 not found" }
+        error: { type: string, example: "Employee 3 not found" }
 
     ContractType:
       type: string
@@ -225,7 +225,7 @@ components:
       type: object
       required: [name, email, contractType, startDate, salary]
       properties:
-        name:         { type: string, example: "Alice Doe" }
+        name:         { type: string, example: "John Smith" }
         email:        { type: string, format: email }
         address:      { type: string }
         contractType: { $ref: '#/components/schemas/ContractType' }

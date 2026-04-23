@@ -32,8 +32,8 @@ class EmployeeServiceTest {
     private Employee sample(Long id, Rank rank, LocalDate startDate, BigDecimal salary) {
         Employee e = new Employee();
         e.setId(id);
-        e.setName("Alice");
-        e.setEmail("a@example.com");
+        e.setName("Eryk");
+        e.setEmail("em558@gmail.com");
         e.setContractType(ContractType.FULL_TIME);
         e.setStartDate(startDate);
         e.setSalary(salary);
@@ -50,10 +50,7 @@ class EmployeeServiceTest {
                 .hasMessageContaining("99");
     }
 
-    /**
-     * The rule is an employee who started less than 6 months ago is not eligible for a promotion.
-     * Here the tenure is 3 months so we expect NotEligibleException.
-     */
+
     @Test
     void promote_throwsWhenTenureUnderSixMonths() {
         Employee e = sample(1L, Rank.JUNIOR,
@@ -66,10 +63,7 @@ class EmployeeServiceTest {
                 .hasMessageContaining("less than 6 months");
     }
 
-    /**
-     * The rule is an employee who already has the top rank (Senior) is not able to
-     * promote further.
-     */
+
     @Test
     void promote_throwsWhenAlreadySenior() {
         Employee e = sample(1L, Rank.SENIOR,
@@ -79,7 +73,7 @@ class EmployeeServiceTest {
 
         assertThatThrownBy(() -> service.promote(1L))
                 .isInstanceOf(NotEligibleException.class)
-                .hasMessageContaining("top rank");
+                .hasMessageContaining("Senior");
     }
 
     @Test

@@ -26,7 +26,7 @@ public class DepartmentController {
     public List<DepartmentResponse> list() {
         List<DepartmentResponse> result = new ArrayList<>();
         for (Department d : service.list()) {
-            result.add(new DepartmentResponse(d));
+            result.add(new DepartmentResponse(d.getId(), d.getName(), d.getBudget(), d.getLocation()));
         }
         return result;
     }
@@ -36,6 +36,6 @@ public class DepartmentController {
         var created = service.create(req);
         return ResponseEntity
                 .created(URI.create("/api/departments/" + created.getId()))
-                .body(DepartmentResponse.from(created));
+                .body(new DepartmentResponse(created.getId(), created.getName(), created.getBudget(), created.getLocation()));
     }
 }

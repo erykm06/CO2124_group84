@@ -5,7 +5,6 @@ import com.example.hqadministrationapi.domain.Employee;
 import com.example.hqadministrationapi.domain.Rank;
 import com.example.hqadministrationapi.exception.NotEligibleException;
 import com.example.hqadministrationapi.repository.EmployeeRepository;
-import com.example.hqadministrationapi.service.EmployeeService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -51,6 +50,10 @@ class EmployeeServiceTest {
                 .hasMessageContaining("99");
     }
 
+    /**
+     * The rule is an employee who started less than 6 months ago is not eligible for a promotion.
+     * Here the tenure is 3 months so we expect NotEligibleException.
+     */
     @Test
     void promote_throwsWhenTenureUnderSixMonths() {
         Employee e = sample(1L, Rank.JUNIOR,
@@ -63,6 +66,10 @@ class EmployeeServiceTest {
                 .hasMessageContaining("less than 6 months");
     }
 
+    /**
+     * The rule is an employee who already has the top rank (Senior) is not able to
+     * promote further.
+     */
     @Test
     void promote_throwsWhenAlreadySenior() {
         Employee e = sample(1L, Rank.SENIOR,
@@ -84,13 +91,13 @@ class EmployeeServiceTest {
 
         Employee result = service.promote(1L);
 
-        assertThat(result.getRank()).isEqualTo(Rank.MID);
+        assertThat(result.getRank()).isEqualTo(Rank.INTERMEDIATE);
         assertThat(result.getSalary()).isEqualByComparingTo(new BigDecimal("55000.00"));
     }
 
     @Test
     void promote_midBecomesSeniorWithTenPercentRaise() {
-        Employee e = sample(1L, Rank.MID,
+        Employee e = sample(1L, Rank.INTERMEDIATE,
                 LocalDate.now().minusYears(2),
                 new BigDecimal("70000"));
         when(repo.findById(1L)).thenReturn(Optional.of(e));

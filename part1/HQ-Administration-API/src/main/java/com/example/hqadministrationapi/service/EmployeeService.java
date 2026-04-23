@@ -72,7 +72,7 @@ public class EmployeeService {
     }
 
     /**
-     * Promote: advance rank one step (JUNIOR → MID → SENIOR) and raise salary 10%.
+     * Promote: advance rank one step (JUNIOR → INTERMEDIATE → SENIOR) and raise salary 10%.
      * Rules:
      *  - must have started at least 6 months ago
      *  - must not already be SENIOR
@@ -89,7 +89,7 @@ public class EmployeeService {
             throw new NotEligibleException("Employee already at top rank");
         }
 
-        e.setRank(e.getRank() == Rank.JUNIOR ? Rank.MID : Rank.SENIOR);
+        e.setRank(e.getRank() == Rank.JUNIOR ? Rank.INTERMEDIATE : Rank.SENIOR);
 
         BigDecimal newSalary = e.getSalary()
                 .multiply(BigDecimal.valueOf(1.10))

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/defectDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Defect description"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Severity:"
+        android:paddingTop="16dp"/>
+
+    <RadioGroup
+        android:id="@+id/severityGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <RadioButton
+            android:id="@+id/severityLow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Low"
+            android:checked="true"/>
+
+        <RadioButton
+            android:id="@+id/severityHigh"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="High"/>
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/saveDefectBtn"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Save Defect"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>
